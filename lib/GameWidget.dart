@@ -20,6 +20,7 @@ class _GameState extends State {
   }
 
   var textMsg = "";
+  var CountDevices = "";
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +34,10 @@ class _GameState extends State {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text(
+                CountDevices,
+                style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
+              ),
               Text(
                 textMsg,
                 style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
@@ -70,7 +75,15 @@ class _GameState extends State {
 
   void _sendColorToAllDevices({int red: 250, int green: 30, int blue: 50}) {
     for (int i = 0; i < bleDevices.length; i++) {
-      _sendColorToDevice(i, red: red, green: green, blue: blue);
+
+      var randomRed   = _random.nextInt(255);
+      var randomGreen = _random.nextInt(255);
+      var randomBlue  = _random.nextInt(255);
+
+      print(randomRed);
+      print(randomGreen);
+
+      _sendColorToDevice(i, red: randomRed, green: randomGreen, blue: randomBlue);
     }
 
     bleDevices.forEach((device) {
@@ -96,6 +109,7 @@ class _GameState extends State {
   var _timer;
 
   var counter = 0;
+  var countBleDevices = bleDevices.length;
 
   Random _random = Random();
 
@@ -119,6 +133,7 @@ class _GameState extends State {
 
     setState(() {
       textMsg = "Count number of events: $counter";
+      CountDevices = "Number of connected devices: $countBleDevices";
     });
   }
 }
