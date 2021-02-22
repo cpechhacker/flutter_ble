@@ -13,9 +13,9 @@ class _HomeWidgetState extends State {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow,
+      backgroundColor: Colors.lightBlueAccent,
       appBar: AppBar(
-        title: Text('Raised Button'),
+        title: Text('Games'),
       ),
       body: Container(
         child: Center(
@@ -25,16 +25,16 @@ class _HomeWidgetState extends State {
               RaisedButton(
                 child: Text("Bluetooth selection"),
                 onPressed: _pushBleSelectionPage,
-                color: Colors.red,
-                textColor: Colors.yellow,
+                color: Colors.white,
+                textColor: Colors.blue,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 splashColor: Colors.grey,
               ),
               RaisedButton(
                 child: Text("Start Game"),
                 onPressed: _pushGame,
-                color: Colors.red,
-                textColor: Colors.yellow,
+                color: Colors.blue,
+                textColor: Colors.white,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 splashColor: Colors.grey,
               )

@@ -24,9 +24,9 @@ class _GameState extends State {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow,
+      backgroundColor: Colors.blue,
       appBar: AppBar(
-        title: Text('Raised Button'),
+        title: Text('Game A'),
       ),
       body: Container(
         child: Center(
@@ -38,10 +38,10 @@ class _GameState extends State {
                 style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
               ),
               RaisedButton(
-                child: Text("A button"),
+                child: Text("Send Color to All Devices"),
                 onPressed: _firstButtonPressed,
-                color: Colors.red,
-                textColor: Colors.yellow,
+                color: Colors.white,
+                textColor: Colors.blue,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 splashColor: Colors.grey,
               )
@@ -118,7 +118,7 @@ class _GameState extends State {
     _sendColorToDevice(randomDevice, red: 255, green: 0, blue: 0);
 
     setState(() {
-      textMsg = "Counter: $counter";
+      textMsg = "Count number of events: $counter";
     });
   }
 }
