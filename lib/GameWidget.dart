@@ -123,13 +123,15 @@ class _GameState extends State {
       _timer.cancel();
     }
 
-    if (type == bluetoothData && deviceNumber == 0) {
+    if (bluetoothData.length == 1 && deviceNumber == 0) { // GameEventType.bluetoothReceived
+      print("JA in dieser Schleife!!");
+      print("Count number of events: $counter");
       counter++;
     }
 
     // Send a color to a random device:
     var randomDevice = _random.nextInt(bleDevices.length);
-    _sendColorToDevice(randomDevice, red: 255, green: 0, blue: 0);
+    _sendColorToDevice(randomDevice, red: 255, green: 255, blue: 0);
 
     setState(() {
       textMsg = "Count number of events: $counter";
