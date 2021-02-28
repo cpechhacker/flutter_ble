@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
             if (state == BluetoothState.on) {
               return HomeWidget();
             }
-            return BluetoothOffScreen(state: state);
+            return HomeWidget(); // BluetoothOffScreen(state: state);
           }),
     );
   }
