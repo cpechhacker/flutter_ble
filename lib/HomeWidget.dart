@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_ble_cp/BleDeviceSelectionWidget.dart';
 import 'package:flutter_ble_cp/GameWidget.dart';
+import 'package:flutter_ble_cp/WidgetSelection.dart';
 
 class HomeWidget extends StatefulWidget {
   @override
@@ -37,6 +38,14 @@ class _HomeWidgetState extends State {
                 textColor: Colors.white,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 splashColor: Colors.grey,
+              ),
+              RaisedButton(
+                child: Text("Widget Selection"),
+                onPressed: _pushWidgetSelection,
+                color: Colors.blue,
+                textColor: Colors.white,
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                splashColor: Colors.grey,
               )
             ],
           ),
@@ -58,4 +67,13 @@ class _HomeWidgetState extends State {
       MaterialPageRoute(builder: (context) =>GameWidget()),
     );
   }
+
+  // This code is called when the second button is pressed.
+  void _pushWidgetSelection() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) =>SelectionWidget()),
+    );
+  }
 }
+
+
