@@ -60,7 +60,7 @@ class _GameState extends State {
   // This code is called when the first button is pressed.
   void _firstButtonPressed() {
     print("Button pressed.");
-    _sendColorToAllDevices(red: 0, green: 250, blue: 20);
+    _sendColorToAllDevices(red: 20, green: 250, blue: 0);
   }
 
   void _initializeBleDevices({int red: 250, int green: 30, int blue: 50}) {
@@ -74,16 +74,9 @@ class _GameState extends State {
   }
 
   void _sendColorToAllDevices({int red: 250, int green: 30, int blue: 50}) {
+
     for (int i = 0; i < bleDevices.length; i++) {
-
-      var randomRed   = _random.nextInt(255);
-      var randomGreen = _random.nextInt(255);
-      var randomBlue  = _random.nextInt(255);
-
-      print(randomRed);
-      print(randomGreen);
-
-      _sendColorToDevice(i, red: randomRed, green: randomGreen, blue: randomBlue);
+      _sendColorToDevice(i, red: red, green: green, blue: blue);
     }
 
     bleDevices.forEach((device) {
@@ -111,27 +104,40 @@ class _GameState extends State {
   var counter = 0;
   var countBleDevices = bleDevices.length;
 
+  var lastDevice = 0;
+
   Random _random = Random();
 
   void _onEvent(GameEventType type, {int deviceNumber, List<int> bluetoothData, int timerData}) {
     print("type: $type, deviceNumber: $deviceNumber, bluetoothData: $bluetoothData, timerData: $timerData");
 
-    if (deviceNumber != null && bluetoothData != null && bluetoothData.isNotEmpty && bluetoothData.first == 99) {
+
+    print(lastDevice);
+
+    // Define a random device:
+    var randomDevice = _random.nextInt(bleDevices.length);
+
+    // Define Random Colours
+    var randomRed   = _random.nextInt(255);
+    var randomGreen = _random.nextInt(255);
+    var randomBlue  = _random.nextInt(255);
+
+/*    if (deviceNumber != null && bluetoothData != null && bluetoothData.isNotEmpty && bluetoothData.first == 99) {
       // This Timer will execute the _onEvent after 1 second
       _timer = Timer(Duration(seconds: 1), () => _onEvent(GameEventType.timer, timerData: 25));
     } else if (type == bluetoothData) {
       _timer.cancel();
-    }
+    }*/
 
-    if (bluetoothData.length == 1 && deviceNumber == 0) { // GameEventType.bluetoothReceived
+    if (bluetoothData.length == 1 && deviceNumber == lastDevice) { // GameEventType.bluetoothReceived // && deviceNumber == 0
       print("JA in dieser Schleife!!");
       print("Count number of events: $counter");
       counter++;
+
+      _sendColorToDevice(randomDevice, red: randomRed, green: randomGreen, blue: randomBlue);
+      lastDevice = randomDevice;
     }
 
-    // Send a color to a random device:
-    var randomDevice = _random.nextInt(bleDevices.length);
-    _sendColorToDevice(randomDevice, red: 255, green: 255, blue: 0);
 
     setState(() {
       textMsg = "Count number of events: $counter";
