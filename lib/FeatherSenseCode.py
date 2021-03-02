@@ -32,14 +32,18 @@ np = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.1)
 nb_of_bytes = 3
 def process_bytes(in_bytes):
     print("Bytes received: " + str(in_bytes))
+    np.fill((0,0,0))
+    time.sleep(0.2)
     np.fill((in_bytes[0], in_bytes[1], in_bytes[2]))
 
 def process_button_pressed(is_pressed):
     print("Button change event to: " + str(is_pressed))
     if is_pressed:
+        np.fill((0,0,0))
         uart.write(bytearray([1]))
     else:
-        uart.write(bytearray([0]))
+        5+1
+        ## uart.write(bytearray([0]))
 
 def detect_event():
     return(not switch.value)
