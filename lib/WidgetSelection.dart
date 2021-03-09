@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ble_cp/stopwatch.dart';
 import 'package:flutter_ble_cp/WidgetGauge.dart';
 import 'package:flutter_ble_cp/WidgetColor.dart';
-
+import 'package:flutter_ble_cp/WidgetLineChart.dart';
+import 'package:flutter_ble_cp/BluetoothListen.dart';
 
 class SelectionWidget extends StatefulWidget {
   @override
@@ -47,6 +48,22 @@ class _SelectionWidgetState extends State {
                 textColor: Colors.blue,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 splashColor: Colors.grey,
+              ),
+              RaisedButton(
+                child: Text("Line Chart"),
+                onPressed: _startLineChart,
+                color: Colors.white,
+                textColor: Colors.blue,
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                splashColor: Colors.grey,
+              ),
+              RaisedButton(
+                child: Text("Ble Listen"),
+                onPressed: _startBleListen,
+                color: Colors.white,
+                textColor: Colors.blue,
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                splashColor: Colors.grey,
               )
             ],
           ),
@@ -72,6 +89,18 @@ class _SelectionWidgetState extends State {
   void _startColour() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) =>ColorPickerCP()),
+    );
+  }
+
+  void _startLineChart() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) =>LineChartApp()),
+    );
+  }
+
+  void _startBleListen() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) =>BleListenWidget()),
     );
   }
 
