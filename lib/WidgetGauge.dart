@@ -24,9 +24,13 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+
+var gaugeAnzeige = 56.4; // StopWatchTimer.getDisplayTime(value, hours: false); // , hours: _isHours);
+var gaugeAnzeigeString = gaugeAnzeige.toString();
+
 class _MyHomePageState extends State<MyHomePage> {
-  var GaugeAnzeige = 73.45;
-  var String = "95";
+  //var GaugeAnzeige = 73.45;
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,14 +62,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     startWidth: 10,
                     endWidth: 10)
               ], pointers: <GaugePointer>[
-                NeedlePointer(value: GaugeAnzeige)
+                NeedlePointer(value: gaugeAnzeige)
               ], annotations: <GaugeAnnotation>[
                 GaugeAnnotation(
                     widget: Container(
-                        child: const Text("90.789",   //// HOW TO DO THIS ???
-                            style: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.bold))),
-                    angle: GaugeAnzeige,
+                        child: Text(gaugeAnzeigeString)),
+                    angle: gaugeAnzeige,
                     positionFactor: 0.5)
               ])
             ]));
