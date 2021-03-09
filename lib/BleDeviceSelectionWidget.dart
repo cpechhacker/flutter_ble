@@ -183,7 +183,7 @@ class _BleDeviceSelectionState extends State<BleDeviceSelectionWidget> {
             leading: Icon(Icons.bluetooth),
             onTap: () {
               if (deviceIdConnecting == null) {
-                // TODO: Search FOR ID, which is selected and send color to it
+                onDeviceSelected(context, device);
               }
             },
           );
