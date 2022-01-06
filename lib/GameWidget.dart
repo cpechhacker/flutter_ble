@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_ble_cp/BleDeviceSelectionWidget.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_spinbox/material.dart';
-
-
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class GameWidget extends StatefulWidget {
@@ -21,24 +19,47 @@ class _GameState extends State {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () => _initializeBleDevices());
+    Future.delayed(Duration.zero, () {
+      _initializeBleDevices();
+      _startGame();
+    });
   }
 
+  @override
+  void dispose() async {
+    super.dispose();
+    await _stopWatchTimer.dispose(); // Need to call dispose function.
+  }
+
+  final _colorOff = Colors.black;
+  final _errorColor = Colors.orange;
+
   var textMsg = "";
-  var CountDevices = "";
-  var DeviceSel = "";
+  var countDevices = "";
+  var deviceSel = "";
 
+  var maxEvents = 10;
+  var eventCounter = -1; // Game hasn't started yet
+  BleDevice currentDevice;
 
-  double maxEvents = 10;
+  Random _random = Random();
+
+  bool lightTheme = true;
+  List<Color> currentColors = [Colors.green[900]];
+
+  void changeColors(List<Color> colors) {
+    if (colors != null && colors.isNotEmpty) {
+      setState(() => currentColors = colors);
+    }
+  }
 
   final StopWatchTimer _stopWatchTimer = StopWatchTimer();
   final _scrollController = ScrollController();
 
-  void set_max_events(setGamesCount) {
-    print("################################");
-    print(setGamesCount);
-    maxEvents = setGamesCount;
-}
+  void setMaxEvents(maxEvents) {
+    print('################################\n$maxEvents');
+    this.maxEvents = maxEvents;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +68,8 @@ class _GameState extends State {
       appBar: AppBar(
         title: Text('Game A'),
       ),
-
       body: Container(
         child: Center(
-
-
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -59,7 +77,7 @@ class _GameState extends State {
                 min: 1,
                 max: 20,
                 value: 10,
-                onChanged: (setGamesCount) => set_max_events(setGamesCount),
+                onChanged: (setGamesCount) => setMaxEvents(setGamesCount),
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 0),
@@ -75,20 +93,14 @@ class _GameState extends State {
                           padding: const EdgeInsets.all(8),
                           child: Text(
                             displayTime,
-                            style: const TextStyle(
-                                fontSize: 40,
-                                fontFamily: 'Helvetica',
-                                fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontSize: 40, fontFamily: 'Helvetica', fontWeight: FontWeight.bold),
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8),
                           child: Text(
                             value.toString(),
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Helvetica',
-                                fontWeight: FontWeight.w400),
+                            style: const TextStyle(fontSize: 16, fontFamily: 'Helvetica', fontWeight: FontWeight.w400),
                           ),
                         ),
                       ],
@@ -96,6 +108,7 @@ class _GameState extends State {
                   },
                 ),
               ),
+
               /// Lap time.
               Container(
                 height: 120,
@@ -104,18 +117,14 @@ class _GameState extends State {
                   stream: _stopWatchTimer.records,
                   initialData: _stopWatchTimer.records.value,
                   builder: (context, snap) {
-
                     final value = snap.data;
-
 
                     if (value.isEmpty) {
                       return Container();
                     }
                     Future.delayed(const Duration(milliseconds: 100), () {
-                      _scrollController.animateTo(
-                          _scrollController.position.maxScrollExtent,
-                          duration: const Duration(milliseconds: 200),
-                          curve: Curves.easeOut);
+                      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+                          duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
                     });
                     print('Listen records. $value');
 
@@ -123,26 +132,21 @@ class _GameState extends State {
                       controller: _scrollController,
                       scrollDirection: Axis.vertical,
                       itemBuilder: (BuildContext context, int index) {
-                        final data        = value[index];
+                        final data = value[index];
                         double timeDiff = 0;
 
-                        if(index > 0) {
-                          final data_vorher = value[index-1];
-                          timeDiff = (data.rawValue - data_vorher.rawValue) / 1000;
+                        if (index > 0) {
+                          final previousData = value[index - 1];
+                          timeDiff = (data.rawValue - previousData.rawValue) / 1000;
                         }
-
-
-
                         return Column(
                           children: <Widget>[
                             Padding(
                               padding: const EdgeInsets.all(8),
                               child: Text(
                                 '${index + 1} ${data.displayTime} ## $timeDiff',
-                                style: const TextStyle(
-                                    fontSize: 17,
-                                    fontFamily: 'Helvetica',
-                                    fontWeight: FontWeight.bold),
+                                style:
+                                    const TextStyle(fontSize: 17, fontFamily: 'Helvetica', fontWeight: FontWeight.bold),
                               ),
                             ),
                             const Divider(
@@ -156,10 +160,8 @@ class _GameState extends State {
                   },
                 ),
               ),
-
-
               Text(
-                CountDevices,
+                countDevices,
                 style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
               ),
               Text(
@@ -167,9 +169,87 @@ class _GameState extends State {
                 style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
               ),
               Text(
-                DeviceSel,
+                deviceSel,
                 style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
               ),
+              /*
+              RaisedButton(
+                elevation: 3.0,
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        titlePadding: const EdgeInsets.all(0.0),
+                        contentPadding: const EdgeInsets.all(0.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                        content: SingleChildScrollView(
+                          child: SlidePicker(
+                            pickerColor: currentColor,
+                            onColorChanged: changeColor,
+                            paletteType: PaletteType.rgb,
+                            enableAlpha: false,
+                            displayThumbColor: true,
+                            showLabel: false,
+                            showIndicator: true,
+                            indicatorBorderRadius:
+                            const BorderRadius.vertical(
+                              top: const Radius.circular(25.0),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: const Text('Change me again RGB'),
+                color: currentColor,
+                textColor: useWhiteForeground(currentColor)
+                    ? const Color(0xffffffff)
+                    : const Color(0xff000000),
+              ),
+
+               */
+
+              RaisedButton(
+                elevation: 3.0,
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Select random colors'),
+                        content: SingleChildScrollView(
+                          child: MultipleChoiceBlockPicker(
+                              pickerColors: currentColors,
+                              onColorsChanged: changeColors,
+                              availableColors: [
+                                Colors.red[900],
+                                Colors.green[900],
+                                Colors.lightGreen[900],
+                                Colors.blue[900],
+                                Color.fromRGBO(0, 0, 0, 0.4),
+                                Color.fromRGBO(255, 255, 255, 0.4),
+                                Color.fromRGBO(255, 0, 0, 0.4),
+                                Color.fromRGBO(0, 255, 0, 0.4),
+                                Color.fromRGBO(0, 0, 255, 0.4),
+                                Color.fromRGBO(0, 255, 255, 0.4),
+                                Color.fromRGBO(255, 255, 0, 0.4),
+                                Color.fromRGBO(255, 0, 255, 0.4)
+                              ]),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: const Text('Change me again and select first colour'),
+                color: currentColors[0],
+                textColor: useWhiteForeground(currentColors[0]) ? const Color(0xffffffff) : const Color(0xff000000),
+              ),
+
+              /*
               RaisedButton(
                 child: Text("Send Color to All Devices"),
                 onPressed: _firstButtonPressed,
@@ -177,7 +257,17 @@ class _GameState extends State {
                 textColor: Colors.blue,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 splashColor: Colors.grey,
-              )
+              ),
+               */
+
+              RaisedButton(
+                child: Text("Send Random Color to All Devices"),
+                onPressed: _randomColorButtonPressed,
+                color: Colors.white,
+                textColor: Colors.blue,
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                splashColor: Colors.grey,
+              ),
             ],
           ),
         ),
@@ -185,117 +275,127 @@ class _GameState extends State {
     );
   }
 
-  // This code is called when the first button is pressed.
-  void _firstButtonPressed() {
-    print("Button pressed.");
-    _sendColorToAllDevices(red: 250, green: 0, blue: 0);
+  // This code is called when the second button is pressed.
+  void _randomColorButtonPressed() {
+    print("Random Button pressed.");
+    _sendColorToAllDevices(_randomColor());
   }
 
-  void _initializeBleDevices({int red: 250, int green: 30, int blue: 50}) {
+  void _initializeBleDevices() {
     print("Available devices: ${bleDevices.length}");
 
-    for (int i = 0; i < bleDevices.length; i++) {
-      var device = bleDevices[i];
-      device.tx.value
-          .listen((value) => _onEvent(GameEventType.bluetoothReceived, deviceNumber: i, bluetoothData: value));
+    bleDevices.forEach(
+        (device) => device.tx.value.listen((value) => _onEvent(GameEventType.bluetoothReceived, device, value)));
+  }
+
+  List<int> _colorToRgb(Color c) {
+    return [c.red, c.green, c.blue];
+  }
+
+  void _sendColorToAllDevices(Color colorNew) {
+    bleDevices.forEach((device) => _sendColorToDevice(device, colorNew));
+  }
+
+  void _sendColorToDevice(BleDevice device, Color colorNew) async {
+    var color = _colorToRgb(colorNew);
+    print("COLOR:  ##############################\n$color");
+
+    try {
+      device.rx.write(color, withoutResponse: true).catchError((e) async {
+        print('Error.  Need to try again.');
+        await Future.delayed(const Duration(milliseconds: 50));
+        device.rx.write(color, withoutResponse: true).catchError((e) => 'Still got an error.  Giving up.');
+      });
+    } catch (e) {
+      print("Could not send color to device: $e");
     }
   }
 
-  void _sendColorToAllDevices({int red: 250, int green: 30, int blue: 50}) {
-
-    for (int i = 0; i < bleDevices.length; i++) {
-      _sendColorToDevice(i, red: red, green: green, blue: blue);
-    }
-
-    bleDevices.forEach((device) {
-      // Do something for alle devices.
-    });
+  BleDevice _randomDevice() {
+    var randDeviceId = _random.nextInt(bleDevices.length);
+    return bleDevices[randDeviceId];
   }
 
-  void _sendColorToDevice(int deviceNumber, {int red: 250, int green: 30, int blue: 50}) {
-    var color = [red, green, blue];
+  Color _randomColor() {
+    var randColorId = _random.nextInt(currentColors.length);
+    return currentColors[randColorId];
+  }
 
-    if (deviceNumber <= bleDevices.length) {
-      var device = bleDevices[deviceNumber];
-      try {
-        device.rx.write(color, withoutResponse: true);
-      } catch (e) {
-        print("Could not send color to device: $e");
-      }
+  void _startNextEvent() {
+    bool _ledOnOtherDevice = false;
+    var _ledDeviceMapping = <BleDevice, BleDevice>{};
+
+    if (currentDevice != null) {
+      _sendColorToDevice(currentDevice, _colorOff);
+    }
+
+    eventCounter++;
+    currentDevice = _randomDevice();
+    if (_ledOnOtherDevice) {
+      _sendColorToDevice(_ledDeviceMapping[currentDevice], _randomColor());
     } else {
-      print("This device ($deviceNumber) doesn't exist.");
+      _sendColorToDevice(currentDevice, _randomColor());
     }
-  }
 
-  var _timer;
-
-  var counter = 0;
-  var countBleDevices = bleDevices.length;
-
-  int randomDevice = 0;
-  int lastDevice = 0;
-
-  Random _random = Random();
-
-  void _onEvent(GameEventType type, {int deviceNumber, List<int> bluetoothData, int timerData}) {
-    print("type: $type, deviceNumber: $deviceNumber, bluetoothData: $bluetoothData, timerData: $timerData");
-
-
-    // Define Random Colours
-    var randomRed   = _random.nextInt(255);
-    var randomGreen = _random.nextInt(255);
-    var randomBlue  = _random.nextInt(255);
-
-/*    if (deviceNumber != null && bluetoothData != null && bluetoothData.isNotEmpty && bluetoothData.first == 99) {
-      // This Timer will execute the _onEvent after 1 second
-      _timer = Timer(Duration(seconds: 1), () => _onEvent(GameEventType.timer, timerData: 25));
-    } else if (type == bluetoothData) {
-      _timer.cancel();
-    }*/
-
-    if (bluetoothData.length == 1 && deviceNumber == lastDevice) { // GameEventType.bluetoothReceived // && deviceNumber == 0
-      print("JA in dieser Schleife!!");
-      print("Count number of events: $counter");
-      counter++;
-
-      // Define a random device:
-      randomDevice = _random.nextInt(bleDevices.length);
-
-      //_sendColorToDevice(randomDevice, red: randomRed, green: randomGreen, blue: randomBlue);
-      _sendColorToDevice(randomDevice, red: 0, green: 255, blue: 0);
-      lastDevice = randomDevice;
-
+    if (_stopWatchTimer.isRunning) {
       _stopWatchTimer.onExecute.add(StopWatchExecute.lap);
-    }
-
-    if(counter == 0) {
-      _sendColorToDevice(randomDevice, red: 0, green: 255, blue: 0);
-    }
-
-    if(counter == 1) {
-      _stopWatchTimer.onExecute.add(StopWatchExecute.reset);
+    } else {
       _stopWatchTimer.onExecute.add(StopWatchExecute.start);
     }
+  }
 
-    if(counter >= maxEvents) {
-      _stopWatchTimer.onExecute.add(StopWatchExecute.stop);
-      _sendColorToAllDevices(red: 255, green: 255, blue: 255);
-      print("ENDE");
-      print("###############################");
+  void _startGame() {
+    eventCounter = -1;
+    _sendColorToAllDevices(_randomColor());
+  }
 
-      sleep(const Duration(seconds: 3));
-      _sendColorToAllDevices(red: 0, green: 0, blue: 0);
-      counter = 0;
-      randomDevice = 0;
-      lastDevice = randomDevice;
-      _sendColorToDevice(randomDevice, red: 0, green: 255, blue: 0);
+  void _finishGame() async {
+    eventCounter = -2;  // -2 means we are in _finishGame and should ignore all bluetoothEvents
+    _stopWatchTimer.onExecute.add(StopWatchExecute.stop);
+    _sendColorToAllDevices(Colors.red);
+    await Future.delayed(const Duration(seconds: 3));
+    _startGame();
+  }
+
+  void _blinkError(device) async {
+    _sendColorToDevice(device, _errorColor);
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (currentDevice != device) {
+      _sendColorToDevice(device, _colorOff);
+    }
+  }
+
+
+  void _onEvent(GameEventType type, BleDevice device, List<int> bluetoothData) {
+    print("type: $type, deviceNumber: $device, bluetoothData: $bluetoothData");
+
+    if (bluetoothData.isEmpty || bluetoothData[0] != 1 || eventCounter == -2) {
+      // ignore this event
+      return;
     }
 
+    // Order of if statements is important!
+    if (eventCounter == -1) {
+      // Just started.  StopWatch is stopped and a user has pushed any device.
+      // Start the "real" events:
+      _sendColorToAllDevices(_colorOff);
+      _startNextEvent();
+    } else if (device != currentDevice) {
+      // User pushed the wrong device.
+      // Stupid user.  Just ignore this event.
+      _blinkError(device);
+    } else if (eventCounter >= maxEvents) {
+      // Game has finished.
+      _finishGame();
+    } else {
+      // User pushed the correct device.
+      _startNextEvent();
+    }
 
     setState(() {
-      textMsg = "Count number of events: $counter";
-      CountDevices = "Number of connected devices: $countBleDevices";
-      DeviceSel = "Device selected: $randomDevice";
+      textMsg = 'Count number of events: $eventCounter';
+      countDevices = 'Number of connected devices: ${bleDevices.length}';
+      deviceSel = 'Device selected: ${bleDevices.indexOf(currentDevice)}';
     });
   }
 }
