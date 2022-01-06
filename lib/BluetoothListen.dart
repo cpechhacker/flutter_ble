@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ble_cp/BleDeviceSelectionWidget.dart';
 import "dart:typed_data";
 
-//
+
 class BleListenWidget extends StatefulWidget {
   @override
   _BleListenWidget createState() => _BleListenWidget();
