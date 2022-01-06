@@ -1,4 +1,4 @@
-import 'package:flutter_ble_cp/fake_chart_series.dart';
+import 'file:///C:/Users/chris/AndroidStudioProjects/flutter_ble_cp/dart_alt/fake_chart_series.dart';
 import 'package:fl_animated_linechart/fl_animated_linechart.dart';
 import 'package:flutter/material.dart';
 

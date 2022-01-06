@@ -69,7 +69,7 @@ class _ColorPickerState extends State {
                         },
                       );
                     },
-                    child: const Text('Change me'),
+                    child: const Text('Change me RGB'),
                     color: currentColor,
                     textColor: useWhiteForeground(currentColor)
                         ? const Color(0xffffffff)
@@ -106,7 +106,7 @@ class _ColorPickerState extends State {
                         },
                       );
                     },
-                    child: const Text('Change me again'),
+                    child: const Text('Change me again RGB'),
                     color: currentColor,
                     textColor: useWhiteForeground(currentColor)
                         ? const Color(0xffffffff)
@@ -153,7 +153,7 @@ class _ColorPickerState extends State {
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
-                                title: Text('Select a color'),
+                                title: Text('Select a color CP'),
                                 content: SingleChildScrollView(
                                   child: BlockPicker(
                                     pickerColor: currentColor,
@@ -164,7 +164,7 @@ class _ColorPickerState extends State {
                             },
                           );
                         },
-                        child: const Text('Change me'),
+                        child: const Text('Change meeeeee'),
                         color: currentColor,
                         textColor: useWhiteForeground(currentColor)
                             ? const Color(0xffffffff)
@@ -188,9 +188,9 @@ class _ColorPickerState extends State {
                             },
                           );
                         },
-                        child: const Text('Change me again'),
-                        color: currentColor,
-                        textColor: useWhiteForeground(currentColor)
+                        child: const Text('Change me again and select first colour'),
+                        color: currentColors[1],
+                        textColor: useWhiteForeground(currentColors[1])
                             ? const Color(0xffffffff)
                             : const Color(0xff000000),
                       )
