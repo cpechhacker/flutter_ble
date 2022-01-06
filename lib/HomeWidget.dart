@@ -64,7 +64,7 @@ class _HomeWidgetState extends State {
   // This code is called when the second button is pressed.
   void _pushGame() {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) =>GameWidget()),
+      MaterialPageRoute(builder: (context) => GameWidget()),
     );
   }
 
