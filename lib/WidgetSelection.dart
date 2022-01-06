@@ -4,6 +4,7 @@ import 'package:flutter_ble_cp/WidgetGauge.dart';
 import 'package:flutter_ble_cp/WidgetColor.dart';
 import 'package:flutter_ble_cp/WidgetLineChart.dart';
 import 'package:flutter_ble_cp/BluetoothListen.dart';
+import 'package:flutter_ble_cp/WidgetSlider.dart';
 
 class SelectionWidget extends StatefulWidget {
   @override
@@ -64,6 +65,14 @@ class _SelectionWidgetState extends State {
                 textColor: Colors.blue,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 splashColor: Colors.grey,
+              ),
+              RaisedButton(
+                child: Text("Slider Testing"),
+                onPressed: _startSlider,
+                color: Colors.white,
+                textColor: Colors.blue,
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                splashColor: Colors.grey,
               )
             ],
           ),
@@ -101,6 +110,12 @@ class _SelectionWidgetState extends State {
   void _startBleListen() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) =>BleListenWidget()),
+    );
+  }
+
+  void _startSlider() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) =>SliderWidget()),
     );
   }
 
