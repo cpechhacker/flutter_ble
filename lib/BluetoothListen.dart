@@ -20,6 +20,7 @@ class _BleListenWidget extends State {
   double val = 6;
   var textMsg = "";
   String valueString = "Das ist ein Text Test";
+  bool blue = false;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +63,24 @@ class _BleListenWidget extends State {
                 },
               ),
 
+              Icon(
+                Icons.favorite,
+                color: Colors.pink,
+                size: 24.0,
+                semanticLabel: 'Text to announce in accessibility modes',
+              ),
+              Text("Trains",
+              ),
+              IconButton(
+                icon: Icon(Icons.favorite,
+                    color: Colors.green[600]),
+
+                onPressed: () {
+                  setState(() {
+                    blue = true;
+                  });
+                },
+              ),
 
 
             ],
@@ -127,7 +146,7 @@ class _BleListenWidget extends State {
     Uint8List intBytes = Uint8List.fromList(bluetoothData.toList());
     List<double> floatList = intBytes.buffer.asFloat32List();
     print(floatList);
-    textMsg = 'Count number of events: $floatList';
+    textMsg = 'BLE return value: $floatList';
 
     // print("type: $type, deviceNumber: $deviceNumber, bluetoothData: $bluetoothData, timerData: $timerData");
 
