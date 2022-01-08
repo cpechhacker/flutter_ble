@@ -18,6 +18,8 @@ class _BleListenWidget extends State {
   }
 
   double val = 6;
+  var textMsg = "";
+  String valueString = "Das ist ein Text Test";
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,7 @@ class _BleListenWidget extends State {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               RaisedButton(
-                child: Text("Send Color to All Devices - BLE LISTEN TEST"),
+                child: Text("Send Color to All Devices - BLE LISTEN TEST CP"),
                 onPressed: _firstButtonPressed,
                 color: Colors.white,
                 textColor: Colors.blue,
@@ -54,6 +56,13 @@ class _BleListenWidget extends State {
                 max: 10,
                 activeColor: Colors.green,
               ),
+              TextField(
+                onChanged: (text) {
+                  valueString = text;
+                },
+              ),
+
+
 
             ],
           ),
@@ -66,10 +75,12 @@ class _BleListenWidget extends State {
   // This code is called when the first button is pressed.
   void _firstButtonPressed() {
     print("Button 'Send Color to All Devices' pressed.");
-    var waiting_time_int = val.toInt();
-    print("Slider Value: $waiting_time_int");
-    _sendBleDataToAllDevices(red: 250, green: 0, blue: 0, wait: waiting_time_int);
+    var waitingTimeInt = val.toInt();
+    print("Slider Value: $waitingTimeInt");
+    _sendBleDataToAllDevices(red: 250, green: 0, blue: 0, wait: waitingTimeInt);
     //_sendBleDataToAllDevices(red: 250, green: 0, blue: 0, wait: 1);
+
+
   }
 
   void _initializeBleDevices() {
@@ -112,9 +123,11 @@ class _BleListenWidget extends State {
     print("BLE Data:");
     print(bluetoothData);
 
-    // Uint8List intBytes = Uint8List.fromList(bluetoothData.toList());
-    // List<double> floatList = intBytes.buffer.asFloat32List();
-    // print(floatList);
+    // Todo: Show retreived values every time value is changed -> not in _onEvent Function
+    Uint8List intBytes = Uint8List.fromList(bluetoothData.toList());
+    List<double> floatList = intBytes.buffer.asFloat32List();
+    print(floatList);
+    textMsg = 'Count number of events: $floatList';
 
     // print("type: $type, deviceNumber: $deviceNumber, bluetoothData: $bluetoothData, timerData: $timerData");
 
