@@ -20,7 +20,11 @@ class _BleListenWidget extends State {
   double val = 6;
   var textMsg = "";
   String valueString = "Das ist ein Text Test";
-  bool blue = false;
+
+  List<double> _bleData;
+  double data_output;
+
+  int _counter = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +58,11 @@ class _BleListenWidget extends State {
                   });
                 },
                 min: 1,
-                max: 10,
+                max: 100,
                 activeColor: Colors.green,
+                inactiveColor: Colors.green[100],
+                label: val.round().toString(),
+                divisions: 100,
               ),
               TextField(
                 onChanged: (text) {
@@ -65,22 +72,18 @@ class _BleListenWidget extends State {
 
               Icon(
                 Icons.favorite,
-                color: Colors.pink,
+                color: Colors.green[600],
                 size: 24.0,
                 semanticLabel: 'Text to announce in accessibility modes',
               ),
-              Text("Trains",
-              ),
-              IconButton(
-                icon: Icon(Icons.favorite,
-                    color: Colors.green[600]),
+              Text('Data: $data_output'),
 
-                onPressed: () {
-                  setState(() {
-                    blue = true;
-                  });
-                },
+              FloatingActionButton(
+                onPressed: _get_ble_data,
+                child: Icon(Icons.gesture)
               ),
+              Text('$_counter'),
+              Text('Data: $_bleData'),
 
 
             ],
@@ -98,8 +101,6 @@ class _BleListenWidget extends State {
     print("Slider Value: $waitingTimeInt");
     _sendBleDataToAllDevices(red: 250, green: 0, blue: 0, wait: waitingTimeInt);
     //_sendBleDataToAllDevices(red: 250, green: 0, blue: 0, wait: 1);
-
-
   }
 
   void _initializeBleDevices() {
@@ -139,17 +140,26 @@ class _BleListenWidget extends State {
   }
 
   void _onEvent(GameEventType type, {int deviceNumber, List<int> bluetoothData}) {  // List<int> bluetoothData
-    print("BLE Data:");
-    print(bluetoothData);
+    setState(() {
+      print("BLE Data:");
+      //print(bluetoothData);
 
-    // Todo: Show retreived values every time value is changed -> not in _onEvent Function
-    Uint8List intBytes = Uint8List.fromList(bluetoothData.toList());
-    List<double> floatList = intBytes.buffer.asFloat32List();
-    print(floatList);
-    textMsg = 'BLE return value: $floatList';
+      Uint8List intBytes = Uint8List.fromList(bluetoothData.toList());
+      List<double> floatList = intBytes.buffer.asFloat32List();
 
-    // print("type: $type, deviceNumber: $deviceNumber, bluetoothData: $bluetoothData, timerData: $timerData");
+      _bleData = floatList;
+      print(_bleData);
 
+      data_output = double.parse((_bleData[3]).toStringAsFixed(2));
+      // print("type: $type, deviceNumber: $deviceNumber, bluetoothData: $bluetoothData, timerData: $timerData");
+    });
+
+  }
+
+  void _get_ble_data( {List<int> bluetoothData}) {
+    setState(() {
+      _counter++;
+    });
   }
 
 
