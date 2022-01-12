@@ -5,6 +5,7 @@ import 'package:flutter_ble_cp/WidgetColor.dart';
 import 'package:flutter_ble_cp/WidgetLineChart.dart';
 import 'package:flutter_ble_cp/BluetoothListen.dart';
 import 'package:flutter_ble_cp/WidgetSlider.dart';
+import 'package:flutter_ble_cp/FarbenDrippling.dart';
 
 class SelectionWidget extends StatefulWidget {
   @override
@@ -66,14 +67,22 @@ class _SelectionWidgetState extends State {
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 splashColor: Colors.grey,
               ),
-              RaisedButton(
+/*              RaisedButton(
                 child: Text("Slider Testing"),
                 onPressed: _startSlider,
                 color: Colors.white,
                 textColor: Colors.blue,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 splashColor: Colors.grey,
-              )
+              )*/
+              RaisedButton(
+                child: Text("Farben Drippling"),
+                onPressed: _startFarbenDrippling,
+                color: Colors.white,
+                textColor: Colors.blue,
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                splashColor: Colors.grey,
+              ),
             ],
           ),
         ),
@@ -118,5 +127,13 @@ class _SelectionWidgetState extends State {
       MaterialPageRoute(builder: (context) =>SliderWidget()),
     );
   }
+
+  void _startFarbenDrippling() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) =>SliderFarbenDrippling()),
+    );
+  }
+
+
 
 }
