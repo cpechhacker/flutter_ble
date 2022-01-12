@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_ble_cp/BleDeviceSelectionWidget.dart';
 import "dart:typed_data";
+import 'package:syncfusion_flutter_gauges/gauges.dart';
+
+import 'package:flutter_ble_cp/BleDeviceSelectionWidget.dart';
 
 class BleListenWidget extends StatefulWidget {
   @override
@@ -22,7 +24,7 @@ class _BleListenWidget extends State {
   String valueString = "Das ist ein Text Test";
 
   List<double> _bleData;
-  double data_output;
+  double data_output = 0.0;
 
   int _counter = 0;
 
@@ -77,6 +79,46 @@ class _BleListenWidget extends State {
                 semanticLabel: 'Text to announce in accessibility modes',
               ),
               Text('Data: $data_output'),
+
+             SfRadialGauge(
+                  title: GaugeTitle(
+                      text: 'Speedometer',
+                      textStyle: const TextStyle(
+                          fontSize: 20.0, fontWeight: FontWeight.bold)),
+                  axes: <RadialAxis>[
+                    RadialAxis(minimum: 0, maximum: 80, ranges: <GaugeRange>[
+                      GaugeRange(
+                          startValue: 0,
+                          endValue: 30,
+                          color: Colors.green,
+                          startWidth: 10,
+                          endWidth: 10),
+                      GaugeRange(
+                          startValue: 30,
+                          endValue: 60,
+                          color: Colors.orange,
+                          startWidth: 10,
+                          endWidth: 10),
+                      GaugeRange(
+                          startValue: 60,
+                          endValue: 80,
+                          color: Colors.red,
+                          startWidth: 10,
+                          endWidth: 10)
+                    ], pointers: <GaugePointer>[
+                      NeedlePointer(value: data_output)
+                    ], annotations: <GaugeAnnotation>[
+                      GaugeAnnotation(
+                          widget: Container(
+                              child: Text(data_output.toString())),
+                          angle: data_output,
+                          positionFactor: 0.5)
+                    ])
+                  ]),
+
+
+
+
 
               FloatingActionButton(
                 onPressed: _get_ble_data,
@@ -148,7 +190,7 @@ class _BleListenWidget extends State {
       List<double> floatList = intBytes.buffer.asFloat32List();
 
       _bleData = floatList;
-      print(_bleData);
+      //print(_bleData);
 
       data_output = double.parse((_bleData[3]).toStringAsFixed(2));
       // print("type: $type, deviceNumber: $deviceNumber, bluetoothData: $bluetoothData, timerData: $timerData");
