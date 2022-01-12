@@ -70,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     angle: gaugeAnzeige,
                     positionFactor: 0.5)
               ])
-            ]));
+            ])
+    );
   }
 }
