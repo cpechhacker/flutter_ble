@@ -139,9 +139,9 @@ class _BleListenWidget extends State {
   // This code is called when the first button is pressed.
   void _firstButtonPressed() {
     print("Button 'Send Color to All Devices' pressed.");
-    var waitingTimeInt = val.toInt();
-    print("Slider Value: $waitingTimeInt");
-    _sendBleDataToAllDevices(red: 250, green: 0, blue: 0, wait: waitingTimeInt);
+    var waitingTimeDouble = val.toDouble();
+    print("Slider Value: $waitingTimeDouble");
+    _sendBleDataToAllDevices(red: 250, green: 0, blue: 0, wait: waitingTimeDouble);
     //_sendBleDataToAllDevices(red: 250, green: 0, blue: 0, wait: 1);
   }
 
@@ -155,7 +155,7 @@ class _BleListenWidget extends State {
     }
   }
 
-  void _sendBleDataToAllDevices({int red: 250, int green: 30, int blue: 50, int wait: 1}) {  // double wait: 1
+  void _sendBleDataToAllDevices({int red: 250, int green: 30, int blue: 50, double wait: 1}) {  // double wait: 1
 
     for (int i = 0; i < bleDevices.length; i++) {
       _sendBleDataToDevice(i, red: red, green: green, blue: blue, wait: wait); //
@@ -165,14 +165,31 @@ class _BleListenWidget extends State {
       // Do something for alle devices.
     });
   }
+
+  List<int> convertDouble32ToBytes(double d) {
+    var buffer = Uint8List(3);
+    var byteData = buffer.buffer.asByteData();
+    byteData.setFloat32(0, d);
+    return buffer;
+  }
+
   // Todo let waiting time be a double -> problems with device.rx.write
-  void _sendBleDataToDevice(int deviceNumber, {int red: 250, int green: 30, int blue: 50, int wait: 1}) {
-    var data = [red, green, blue, wait];
+  void _sendBleDataToDevice(int deviceNumber, {int red: 250, int green: 30, int blue: 50, double wait: 1}) {
+    var buffer = Uint8List(6);
+
+    var byteData = buffer.buffer.asByteData();
+    byteData.setInt8(0, red);
+    byteData.setInt8(1, green);
+    byteData.setInt8(2, blue);
+    byteData.setFloat32(3, wait);
+
+    //b.addAll(convertDouble32ToBytes(wait))
+
 
     if (deviceNumber <= bleDevices.length) {
       var device = bleDevices[deviceNumber];
       try {
-        device.rx.write(data, withoutResponse: true);
+        device.rx.write(buffer, withoutResponse: true);
       } catch (e) {
         print("CP: Could not send color to device: $e");
       }
@@ -181,21 +198,40 @@ class _BleListenWidget extends State {
     }
   }
 
+/*
   void _onEvent(GameEventType type, {int deviceNumber, List<int> bluetoothData}) {  // List<int> bluetoothData
     setState(() {
       print("BLE Data:");
-      //print(bluetoothData);
+      print(bluetoothData);
 
       Uint8List intBytes = Uint8List.fromList(bluetoothData.toList());
       List<double> floatList = intBytes.buffer.asFloat32List();
 
+
       _bleData = floatList;
-      //print(_bleData);
+      print(_bleData);
 
       data_output = double.parse((_bleData[3]).toStringAsFixed(2));
       // print("type: $type, deviceNumber: $deviceNumber, bluetoothData: $bluetoothData, timerData: $timerData");
     });
+*/
 
+
+    void _onEvent(GameEventType type, {int deviceNumber, var bluetoothData}) {  // List<int> bluetoothData
+      setState(() {
+        print("BLE Data:");
+        print(bluetoothData);
+
+        Uint8List intBytes = Uint8List.fromList(bluetoothData.toList());
+        List<double> floatList = intBytes.buffer.asFloat32List();
+
+
+        _bleData = floatList;
+        print(_bleData);
+
+        data_output = double.parse((_bleData[3]).toStringAsFixed(2));
+        // print("type: $type, deviceNumber: $deviceNumber, bluetoothData: $bluetoothData, timerData: $timerData");
+      });
   }
 
   void _get_ble_data( {List<int> bluetoothData}) {
