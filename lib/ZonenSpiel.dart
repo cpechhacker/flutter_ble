@@ -2,8 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_ble_cp/BleDeviceSelectionWidget.dart';
-import "dart:typed_data";
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_ble_cp/SelectColours.dart';
 
 class SliderZonenSpiel extends StatefulWidget {
   @override
@@ -18,10 +17,6 @@ class _SliderZonenSpiel extends State {
     super.initState();
     Future.delayed(Duration.zero, () => _initializeBleDevices());
   }
-
-  List<Color> currentColors = [Color.fromRGBO(255, 0, 0, 0.4)];
-  Random _random = Random();
-  Color col_selected = Color.fromRGBO(255, 0, 0, 0.4);
 
   double _startValueEventTimer = 3;
   double _endValueEventTimer = 10;
@@ -48,40 +43,9 @@ class _SliderZonenSpiel extends State {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              RaisedButton(
-                elevation: 3.0,
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('Select random colors'),
-                        content: SingleChildScrollView(
-                          child: MultipleChoiceBlockPicker(
-                              pickerColors: currentColors,
-                              onColorsChanged: changeColors,
-                              availableColors: [
 
-                                Color.fromRGBO(0, 0, 0, 0.4),
-                                Color.fromRGBO(255, 255, 255, 0.4),
-                                Color.fromRGBO(255, 0, 0, 0.4),
-                                Color.fromRGBO(0, 255, 0, 0.4),
-                                Color.fromRGBO(0, 0, 255, 0.4),
-                                Color.fromRGBO(255, 90, 0, 1.0),
-                                Color.fromRGBO(0, 255, 255, 0.4),
-                                Color.fromRGBO(255, 255, 0, 0.4),
-                                Color.fromRGBO(255, 0, 255, 0.4)
-                              ]),
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: const Text('Colour next event'),
-                color: col_selected, // currentColors[0],
-                textColor: useWhiteForeground(col_selected) ? const Color(0xffffffff) : const Color(0xff000000),
-
-              ),
+              buildColours(context),
+              sendColours(),
 
               Text('Event Time next event: $waitingTimeInt'),
 
@@ -166,14 +130,7 @@ class _SliderZonenSpiel extends State {
                   )
               ),
 
-              RaisedButton(
-                child: Text("Send Color to all Devices"),
-                onPressed: _do_color_button_press,
-                color: Colors.white,
-                textColor: Colors.blue,
-                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                splashColor: Colors.grey,
-              ),
+
 
             ],
           ),
@@ -183,13 +140,6 @@ class _SliderZonenSpiel extends State {
   }
 
 
-
-  void changeColors(List<Color> colors) {
-    if (colors != null && colors.isNotEmpty) {
-      setState(() => currentColors = colors);
-    }
-    print("Current Colors: $currentColors");
-  }
 
   void _initializeBleDevices() {
     print("Available devices: ${bleDevices.length}");
@@ -203,13 +153,14 @@ class _SliderZonenSpiel extends State {
     print(bluetoothData);
 
     setState(() {
-      col_selected = _randomColor();
-      print("Color selected: $col_selected");
+      var col_selected = randColor; //ToDo: eigentlich sollte _randomColor() aufgerufen werden
+      //print("Color selected: $col_selected");
 
       final _randomWaitingTime = new Random();
       waitingTimeInt = _startValueEventTimer.round() + _randomWaitingTime.nextInt(_endValueEventTimer.round() - _startValueEventTimer.round());
       print("Waiting Time $waitingTimeInt");
 
+      //ToDo: Hier soll nicht mehr "_sendBleDataToAllDevices" benötigt werden
       _sendBleDataToAllDevices(red: col_selected.red, green: col_selected.green, blue: col_selected.blue, wait: waitingTimeInt);
     });
 
@@ -221,11 +172,12 @@ class _SliderZonenSpiel extends State {
     }
 
     bleDevices.forEach((device) {
+      // _sendBleDataToDevice(i, red: red, green: green, blue: blue, wait: wait); //
       // Do something for alle devices.
     });
   }
 
-  // Todo let waiting time be a double -> problems with device.rx.write
+// Todo let waiting time be a double -> problems with device.rx.write
   void _sendBleDataToDevice(int deviceNumber, {int red: 250, int green: 30, int blue: 50, int wait: 1}) {
     var data = [red, green, blue, wait];
 
@@ -241,24 +193,10 @@ class _SliderZonenSpiel extends State {
     }
   }
 
-  void _do_color_button_press() {
-    setState(() {
-      col_selected = _randomColor();
-      print("Color selected: $col_selected");
-
-      final _randomWaitingTime = new Random();
-      waitingTimeInt = _startValueEventTimer.round() + _randomWaitingTime.nextInt(_endValueEventTimer.round() - _startValueEventTimer.round());
-      print("Waiting Time $waitingTimeInt");
 
 
-      _sendBleDataToAllDevices(red: col_selected.red, green: col_selected.green, blue: col_selected.blue, wait: waitingTimeInt);
-    });
-  }
 
-  Color _randomColor() {
-    var randColorId = _random.nextInt(currentColors.length);
-    return currentColors[randColorId];
-  }
+
 
 }
 
