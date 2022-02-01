@@ -1,9 +1,15 @@
+// https://www.fluttercampus.com/guide/239/listen-volume-button-press/#:~:text=When%20the%20Volume%20Up%20button,Volume%20down%20in%20Flutter%20App.
+//https://github.com/JiangJuHong/FlutterPerfectVolumeControl
+//https://micropython-glenn20.readthedocs.io/en/latest/library/espnow.html
+
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_ble_cp/BleDeviceSelectionWidget.dart';
 import "dart:typed_data";
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+
+import 'package:flutter_ble_cp/SelectColours.dart';
 
 class SliderFarbenDrippling extends StatefulWidget {
   @override
@@ -16,6 +22,12 @@ class _SliderFarbenDrippling extends State {
   @override
   void initState() {
     super.initState();
+
+    //PerfectVolumeControl.stream.listen((volume) {
+      //volume button is pressed,
+      // this listener will be triggeret 3 times at one button press
+    // });
+
     Future.delayed(Duration.zero, () => _initializeBleDevices());
   }
 
