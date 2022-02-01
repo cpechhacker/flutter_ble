@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_ble_cp/stopwatch.dart';
 import 'package:flutter_ble_cp/WidgetGauge.dart';
 import 'package:flutter_ble_cp/WidgetColor.dart';
 import 'package:flutter_ble_cp/WidgetLineChart.dart';
+
 import 'package:flutter_ble_cp/BluetoothListen.dart';
 import 'package:flutter_ble_cp/WidgetSlider.dart';
-import 'package:flutter_ble_cp/FarbenDrippling.dart';
 import 'package:flutter_ble_cp/ZonenSpiel.dart';
+import 'package:flutter_ble_cp/WidgetModulTesting.dart';
+
 
 class SelectionWidget extends StatefulWidget {
   @override
@@ -99,8 +102,8 @@ class _SelectionWidgetState extends State {
     );
   }
 
-  // This code is called when the first button is pressed.
-  // This code is called when the second button is pressed.
+
+
   void _startStopwatch() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) =>StopwatchWidget()),
